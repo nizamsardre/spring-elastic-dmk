@@ -1,0 +1,84 @@
+replicaCount: 5
+
+image:
+  repository: 906388694478.dkr.ecr.ap-southeast-1.amazonaws.com/dhamaka-pay
+  pullPolicy: IfNotPresent
+  tag: "does-not-exist"
+
+
+serviceAccount:
+  create: false
+  name: ""
+
+podAnnotations: {}
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/limit-rps: "2"
+  hosts:
+    - host: pay.dhamakashopping.com
+
+
+configMap:
+  enabled: true
+  volumeMounts:
+    - mountPath: /app/application.properties
+      subPath: application.properties
+  data:
+  - application.properties: |-
+      server.port=8080
+      udhokta.base.url=https://udhokta.dhamakashopping.com
+      spring.data.mongodb.uri=mongodb://10.10.4.16:5556,10.10.5.37:5557,10.10.6.24:5558/dhamaka?readPreference=secondaryPreferred&maxStalenessSeconds=120&replicaSet=dhamaka_rs
+      logging.pattern.console=%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n
+      management.endpoint.health.show-details=always
+      management.endpoint.metrics.enabled=true
+      management.endpoint.prometheus.enabled=true
+      management.metrics.export.prometheus.enabled=true
+      SSLCOMMERZ_URL=https://securepay.sslcommerz.com
+      SSL_USERNAME=Microtrade
+      SSL_PASSWORD=MTFBLit321
+      SSL_SERVICEID=MicrotradeNonBrand
+      SSLCOMMERZ_STORE_ID=dhamakadigitallive
+      SSLCOMMERZ_STORE_PASSWORD=5E2D6A33BA6A820066
+      base.url=https://pay.dhamakashopping.com
+      nagad.merchantId=687098157175045
+      nagad.accountNumber=01709815717
+      nagad.public.key=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAiCWvxDZZesS1g1lQfilVt8l3X5aMbXg5WOCYdG7q5C+Qevw0upm3tyYiKIwzXbqexnPNTHwRU7Ul7t8jP6nNVS/jLm35WFy6G9qRyXqMc1dHlwjpYwRNovLc12iTn1C5lCqIfiT+B/O/py1eIwNXgqQf39GDMJ3SesonowWioMJNXm3o80wscLMwjeezYGsyHcrnyYI2LnwfIMTSVN4T92Yy77SmE8xPydcdkgUaFxhK16qCGXMV3mF/VFx67LpZm8Sw3v135hxYX8wG1tCBKlL4psJF4+9vSy4W+8R5ieeqhrvRH+2MKLiKbDnewzKonFLbn2aKNrJefXYY7klaawIDAQAB
+      nagad.private.key=MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCOtE4t2WdoAdk3KXX2xETushrx/XQgcZe/bBWby2I/rLG92CMIGoulR7TeCLo90+U4NrxpWeV1gaJeh435TMqxmP3Lip26eFV2AD1zpvU4GyEqI/kTMaQ25zXzSiX4w4q1zHN7aFcHYoqVXjFitlHlyo+yto70dpt7meaGVcNzTrYvLKPcIxTV+a9K1EyCflD+lShL7CjjpZk/X+n79P/wG9f5ATs4cAx+y76wB5W3Y1b6TqbQZgsI1WjV6SekTD0c9NgVocun7sN3rLxo8nkR5/p0Q18se63dYLcPwps9l1Q+b5EP5taLMa36QfCE0/CX+DNf6u4H2pBDIZ9hbrzlAgMBAAECggEATZORKHWWNEFE/yrH2QUrYANsiH67IWP/FW3BdXckCu9rlIOpz572qTwJA+cEr9XAN0XyOOdIyQ9W4EKamJr5WYCM/5h0VElUVBifT37EseJ1rf3uSlPjLIGWn5KAf/J1No1VfhHjtb0JD1gsSrhIXz41zfZWUmkj7xZj7kUzQjwJDHBf0RQHT/SGt0LxqGbvt5ENqgE8+zVikgTKEWbXwTRqTzcKgBwisez1GvT6mgJNTOM0i2Zslb7Nd8LKsqD73g9Phj1m/ip7sgluzj1nREEa5PQ1PIyRZWyTnxKWxvz2jUTYhyf9DPgCvmvrseT+TKnaUZcCDmg9qy7Kz/k7IQKBgQDDReNnHkk6PfmJwOw1VUe9eJU6BTc7gtWsEPiJ2dqEk9z6oTOqxRfLeAFH02RWo5JSOlb2iIVpd1U10euJuPMABnpL5mgldMBzjzwh/rh0gtQaYiVXgpxYQ8AY2AbkSzwzC10vTKAFF9L3rLt3of7mhjrKte7jgB41SN6PCCjVnQKBgQC7FU8ZTmz0Mi6s7joHL65FwfcDBxYkDMZBnatt6euQ893rpu9f1tMDd6ZZdYu7MZZCjwe87/gzKw2uc8n6ZtPbTm5vi8pFdrxzYvPn9OnlKRNvlmrI5Gohjh3IcyRYPKKOtoWILxl2H1sfFF+tMOuAAE5+He2sLHLAzRcYbyVF6QKBgEFlWm7iWavDrZpQncqOsOPnSjKQJJstidmCJXolF2VnD45wBhmewAVIP0WKqgPJ6+rV1uHhfqx/Zm4Ly1HoOpk7kiFxHFfO7dTFl2HbKHL8jYP4coEIIMv+hIrNbiFugM6nc6Gvi7eo7uI7Wt0Jx4/0TCQvIb3W3kcCDGbiWKqRAoGBALZu3SdsVsr6dJGl7Wg8ktDriJinPGwDGQG7YwRX66L6bBn0O9FVh4gGEW2DNrNgc4qMN5uC1qHvBfRsbTWFOGrPXNnhk2mRk8thXz9+kOcq2w0hvRgRxXzbPSfPQE3bMxm/2w8l/so1YYI5N+OHpN65bdGGFdKjtXNVi4QEPnChAoGBAJyzkQhRRw7ZUne0BGglqk9DinoOHu/Jo2VnRhOW6ijxafLsiCVZWnFezxD4ZifKYMebcXqVJTTfxywxAHoUOdlTdmjZhCREIUt68nphwUN8hjR1+nwBhBcd6dGL2xJZall/yIbvN5mB99H2qlT5gblToRdKY3U+NT7s52e53HT0
+      nagad.base.url= https://api.mynagad.com
+      nagad.callback.url=https://pay.dhamakashopping.com/nagad/callback
+      sebl.merchant.username=SEBLDHAMAKA
+      sebl.merchant.password=411b4e15a68e204f8c1bb37f66ec447a
+      sebl.baseurl=https://southeastbank.gateway.mastercard.com
+      sebl.payment.complete.redirection.url=https://pay.dhamakashopping.com
+      sebl.order.expiry.duration.minutes=1
+      frontend.transaction-detail.url=https://pay.dhamakashopping.com/
+      frontend.transaction-declined.url=https://pay.dhamakashopping.com/failed
+      frontend.transaction-canceled.url=https://pay.dhamakashopping.com/canceled
+      bkash.base.url=https://tokenized.pay.bka.sh/v1.2.0-beta/tokenized
+      bkash.app.key=2f6uepg73p6fk98gbppev6k5lo
+      bkash.app.secret=27cglmh186hp3cs3218sdt6j034sn7bn23863fdlorhk69gnkho
+      bkash.userName=DHAMAKASHOPPINGTC
+      bkash.password=iNv6@Rat3c1H
+
+resources:
+  limits:
+    cpu: 700m
+    memory: 2024Mi
+  requests:
+    cpu: 400m
+    memory: 1024Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 30
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 90

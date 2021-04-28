@@ -1,0 +1,526 @@
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,100' rel='stylesheet' type='text/css'>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet"/>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script th:src="${data.jsFileUrl}"></script>
+    <script type="text/javascript">
+        var JavaSample = {
+            operation: function () {
+                return "CHECK_3DS_ENROLLMENT";
+            },
+            endpoint: function () {
+                console.log('endpoint: ' + window.location.protocol + "//" + window.location.host + "/sebl/check3dsEnrollment");
+                return encodeURI(window.location.protocol + "//" + window.location.host + "/sebl/check3dsEnrollment");
+            },
+            secureIdResponseUrl: function () {
+                return encodeURI(window.location.protocol + "//" + window.location.host + "/sebl/process3ds");
+            }
+        };
+
+    </script>
+
+    <style>
+
+        /* Global */
+        * {
+          box-sizing : border-box;
+        }
+
+        body,
+        html {
+          height     : 100%;
+          min-height : 100%;
+        }
+
+        body {
+          margin           : 0;
+          background-color : #e7e7e7;
+          font-family      : 'Roboto', 'Helvetica', sans-serif;
+        }
+
+        /* Credit Card */
+
+        .credit-card {
+          width            : 360px;
+          height           : 430px;
+          margin           : 60px auto 0;
+          border           : 1px solid #ddd;
+          border-radius    : 6px;
+          background-color : #fff;
+          box-shadow       : 1px 2px 3px 0px rgba(0,0,0,0.10);
+        }
+
+        .form-header {
+          height        : 60px;
+          padding       : 20px 30px 0;
+          border-bottom : 1px solid #E1E8EE;
+        }
+
+        .form-body {
+          height  : 340px;
+          padding : 30px 30px 20px;
+        }
+
+        /* Title */
+
+        .title {
+          margin    : 0;
+          color     : #5e6977;
+          font-size : 18px;
+        }
+
+        /* Common */
+
+        .card-number,
+        .cvv-input input,
+        .month select,
+        .paypal-btn,
+        .proceed-btn,
+        .year select {
+          height : 42px;
+        }
+
+        .card-number,
+        .cvv-input input,
+        .month select,
+        .year select {
+            font-size: 14px;
+            font-weight: 100;
+            line-height: 14px;
+        }
+
+        .card-number,
+        .cvv-details,
+        .cvv-input input,
+        .month select,
+        .year select {
+          color   : #86939e;
+        }
+
+        /* Card Number */
+
+        .card-number {
+          width         : 100%;
+          margin-bottom : 20px;
+          padding-left  : 20px;
+          border        : 2px solid #e1e8ee;
+          border-radius : 6px;
+        }
+
+        /* Date Field */
+
+        .month select,
+        .year select {
+          -moz-appearance     : none;
+          -webkit-appearance  : none;
+          width               : 145px;
+          margin-bottom       : 20px;
+          padding-left        : 20px;
+          border              : 2px solid #e1e8ee;
+          border-radius       : 6px;
+          background          : url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAECAYAAACzzX7wAAAAAXNSR0IArs4c6QAAAFFJREFUCB1jbJs87yoDA4MWEGMD15hY2Jj8GBkZ7qHLgsRAckxl6Ql3mRkZrRkZGC7CFIHYIDGQHJANAR0zV/H/+/11LYjHxModXJEe9hHEBgAvHRRfI26SDQAAAABJRU5ErkJggg==) no-repeat;
+          background-position : 85% 50%;
+        }
+
+        .month select {
+          float : left;
+        }
+
+        .year select {
+          float : right;
+        }
+
+        /* Card Verification Field */
+
+
+         .cvv-input {
+          width         : 145px;
+          float         : left;
+          display:inline-block;
+        }
+
+        .cvv-input input {
+          width         : 100%;
+          padding-left  : 20px;
+          border        : 2px solid #e1e8ee;
+          border-radius : 6px;
+          background    : #fff;
+        }
+
+        .cvv-details {
+          float         : right;
+          margin-bottom : 20px;
+          font-size     : 12px;
+          font-weight   : 300;
+          line-height   : 16px;
+          width: 138px;
+        }
+
+        .cvv-details p {
+          margin-top : 6px;
+        }
+
+        /* Buttons Section */
+
+        .proceed-btn {
+          cursor: pointer;
+          width         : 100%;
+          border-color  : transparent;
+          border-radius : 6px;
+          font-size     : 16px;
+        }
+
+        .proceed-btn {
+          margin-bottom : 10px;
+
+        }
+
+        .proceed-btn#payButton{
+            background  : #009688;
+        }
+
+        .proceed-btn#cancelButton{
+            background  : #9c9c9c;
+        }
+
+        .proceed-btn a {
+          text-decoration : none;
+          cursor          : pointer;
+        }
+
+        .proceed-btn a {
+          color : #fff;
+        }
+
+        .overlay{
+            background    : #009688;
+            position: absolute;
+            z-index: 99;
+
+            width            : 360px;
+          height           : 430px;
+          margin           : 0 auto;
+          border-radius    : 6px;
+          box-shadow       : 1px 2px 3px 0px rgba(0,0,0,0.10);
+          text-align: center;
+
+        }
+
+        .overlay img{
+                height: 80px;
+                width: 80px;
+                margin-top: 120px;
+
+                animation-name: spin;
+                  animation-duration: 1000ms;
+                  animation-iteration-count: infinite;
+                  animation-timing-function: linear;
+        }
+
+        .overlay h4{
+             color: white;
+        }
+
+        @keyframes spin {
+            from {
+                transform:rotate(0deg);
+            }
+            to {
+                transform:rotate(360deg);
+            }
+        }
+}
+    </style>
+
+</head>
+<body>
+
+
+
+<div class="credit-card">
+
+    <div class="overlay">
+        <img src="data:image/png;base64,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" alt="" />
+        <h4>Processing</h4>
+    </div>
+
+    <form>
+        <div class="form-header">
+            <h4 class="title">Provide card details</h4>
+        </div>
+
+        <div class="form-body">
+            <!-- Card Number -->
+            <input type="text" class="card-number" placeholder="Card Number" id="card-number" required="" readonly>
+
+            <!-- Date Field -->
+            <div class="date-field">
+                <div class="month">
+                    <select name="Month" id="expiry-month">
+                        <option value="-1">Expiry Month</option>
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                </div>
+                <div class="year">
+                    <select name="Year" id="expiry-year">
+                        <option value="-1">Expiry Year</option>
+                        <option value="21">2021</option>
+                        <option value="22">2022</option>
+                        <option value="23">2023</option>
+                        <option value="24">2024</option>
+                        <option value="25">2025</option>
+                        <option value="26">2026</option>
+                        <option value="27">2027</option>
+                        <option value="28">2028</option>
+                        <option value="29">2029</option>
+                        <option value="30">2030</option>
+                        <option value="31">2031</option>
+                        <option value="32">2032</option>
+                        <option value="33">2033</option>
+                        <option value="34">2034</option>
+                        <option value="35">2035</option>
+                        <option value="36">2036</option>
+                        <option value="37">2037</option>
+                        <option value="38">2038</option>
+                        <option value="39">2039</option>
+                        <option value="40">2040</option>
+                        <option value="41">2041</option>
+                        <option value="42">2042</option>
+                        <option value="43">2043</option>
+                        <option value="44">2044</option>
+                        <option value="45">2045</option>
+                        <option value="46">2046</option>
+                        <option value="47">2047</option>
+                        <option value="48">2048</option>
+                        <option value="49">2049</option>
+                        <option value="50">2050</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Card Verification Field -->
+            <div class="card-verification">
+                <div class="cvv-input">
+                    <input type="text" placeholder="CVV" id="security-code" required="" readonly>
+                </div>
+                <div class="cvv-details">
+                    <p>CVV is the 3 or 4 digits usually found on the signature strip</p>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <button type="button" class="proceed-btn" id="payButton" onclick="pay();"><a href="#">Proceed</a></button>
+            <button type="button" class="proceed-btn" id="cancelButton" onclick="cancel();"><a href="#">Cancel</a></button>
+        </div>
+    </form>
+
+</div>
+
+<div style="display: none;">
+
+    <input id="order-id" type="text" th:field="${data.orderId}" class="form-control input-md"
+           required=""/>
+    <input id="order-amount" type="text" th:field="${data.amount}" maxlength="14"
+           class="form-control input-md" required=""/>
+    <input id="order-currency" type="text" value="BDT" maxlength="3"
+           class="form-control input-md" required=""/>
+    <input id="order-description" type="text" value="Dhamaka Payment"
+           maxlength="127" class="form-control input-md" required=""/>
+    <input id="transaction-id" type="text" th:field="${data.transactionId}"
+           class="form-control input-md" required=""/>
+
+</div>
+
+<form id="3dsRedirectForm" method="POST" accept-charset="UTF-8" style="display: none;">
+    <!-- Populate the mandatory PaReq parameter with the value returned in the 3DSecure.authenticationRedirect.customized.paReq response parameter.  -->
+
+    <input type="hidden" name="PaReq" id = "PaReq"/>
+
+    <!-- Populate the mandatory TermUrl value with the URL to which you want the payer returned when the authentication process has completed. This should be the same value as supplied in the 3DSecure.authenticationRedirect.responseUrl  parameter to the CHECK_ENROLLMENT request. -->
+
+    <input type="hidden" name="TermUrl" id = "TermUrl"/>
+
+    <!-- The ACS will echo the contents of the mandatory MD parameter when the payer is returned to the URL specified in the TermUrl parameter.  You can use this parameter to establish a link between the ACS request and response. -->
+
+    <input type="hidden" name="MD" id = "MD"/>
+
+    <button id = "submitButton" class="btn btn-primary">Proceed</button>
+
+</form>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
+<script type="text/javascript">
+
+    var progressOverlay = $('.overlay');
+
+$(document).ready(function(){
+
+    toastr.options = {
+      "closeButton": false,
+      "debug": false,
+      "newestOnTop": false,
+      "progressBar": false,
+      "positionClass": "toast-top-center",
+      "preventDuplicates": false,
+      "onclick": null,
+      "showDuration": "300",
+      "hideDuration": "1000",
+      "timeOut": "5000",
+      "extendedTimeOut": "1000",
+      "showEasing": "swing",
+      "hideEasing": "linear",
+      "showMethod": "fadeIn",
+      "hideMethod": "fadeOut"
+  }
+
+  PaymentSession.configure({
+    fields: {
+            // ATTACH HOSTED FIELDS TO YOUR PAYMENT PAGE FOR A CREDIT CARD
+            card: {
+                number: "#card-number",
+                securityCode: "#security-code",
+                expiryMonth: "#expiry-month",
+                expiryYear: "#expiry-year"
+            }
+        },
+        //SPECIFY YOUR MITIGATION OPTION HERE
+        frameEmbeddingMitigation: ["javascript"],
+        callbacks: {
+            initialized: function (response) {
+                hideProgress();
+                console.log("fields attached");
+            },
+            formSessionUpdate: function (response) {
+                // HANDLE RESPONSE FOR UPDATE SESSION
+                console.log("form session updated with data...");
+                console.log(response);
+                if (response.status) {
+                    if ("ok" == response.status) {
+                        console.log("Session updated with data: " + response.session.id);
+
+                        // Submit fields
+                        var data = {
+                            apiOperation: JavaSample.operation(),
+                            sessionId: response.session.id,
+                            transactionId: $('#transaction-id').val(),
+                            orderId: $('#order-id').val(),
+                            orderAmount: $('#order-amount').val(),
+                            orderCurrency: $('#order-currency').val(),
+                            orderDescription: $('#order-description').val(),
+                            secureIdResponseUrl: JavaSample.secureIdResponseUrl()
+                        };
+
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('POST', JavaSample.endpoint(), true);
+                        xhr.setRequestHeader('Content-Type', 'application/json');
+                        xhr.onreadystatechange = function () {
+                            if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+
+                                var jsonResponse = JSON.parse(this.response);
+                                document.getElementById('3dsRedirectForm').action = jsonResponse.acsUrl;
+                                document.getElementById('PaReq').value = jsonResponse.paReq;
+                                document.getElementById('MD').value = jsonResponse.mdValue;
+                                document.getElementById('TermUrl').value = jsonResponse.responseUrl;
+
+                                $('#3dsRedirectForm').submit();
+                            } else if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 406){
+                                console.log("Response: ");
+                                console.log(this.response);
+                                var jsonResponse = JSON.parse(this.response);
+                                handleError(jsonResponse.title + ". " + jsonResponse.message);
+                            } else if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 410){
+                                console.log("Response: ");
+                                console.log(this.response);
+                                var jsonResponse = JSON.parse(this.response);
+                                var failRedirectUrl = '${data.declinedUrlBase}' + '?title=' + encodeURIComponent(jsonResponse.title) + '&message=' + encodeURIComponent(jsonResponse.message);
+                                console.log("Redirect URI: ", failRedirectUrl);
+                                window.location.replace(failRedirectUrl);
+                            }
+                        };
+                        xhr.send(JSON.stringify(data));
+
+                    } else if ("fields_in_error" == response.status) {
+
+                        console.log("Session update failed with field errors.");
+
+                        if (response.errors.cardNumber) {
+                            handleError("Card number missing or invalid.");
+                        }
+                        if (response.errors.expiryYear) {
+                            handleError("Expiry year missing or invalid.");
+                        }
+                        if (response.errors.expiryMonth) {
+                            handleError("Expiry month missing or invalid.");
+                        }
+                        if (response.errors.securityCode) {
+                            handleError("Security code invalid.");
+                        }
+                    } else if ("request_timeout" == response.status) {
+                        handleError("Session update failed with request timeout: " + response.errors.message);
+                    } else if ("system_error" == response.status) {
+                        handleError("Session update failed with system error: " + response.errors.message)
+                    }
+                } else {
+                    handleError("Session update failed: " + response);
+                }
+            }
+        }
+    });
+});
+
+
+  /*  PaymentSession.setFocus('card.number');
+
+    PaymentSession.setFocusStyle(["card.number", "card.securityCode"], {
+        borderColor: 'red',
+        borderWidth: '3px'
+    });
+    */
+
+
+    function pay() {
+        showProgress();
+        PaymentSession.updateSessionFromForm('card');
+    }
+
+    function handleError(message) {
+        hideProgress();
+
+        console.log(message);
+        toastr.error(message);
+    }
+
+    function showProgress(){
+        progressOverlay.fadeIn();
+    }
+
+    function hideProgress(){
+        progressOverlay.fadeOut();
+    }
+
+    function cancel(){
+        window.location.replace('${data.cancelledUrlBase}');
+    }
+
+
+
+</script>
+
+</body>
+</html>

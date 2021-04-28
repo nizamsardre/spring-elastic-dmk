@@ -1,0 +1,56 @@
+replicaCount: 1
+
+image:
+  repository: 906388694478.dkr.ecr.ap-southeast-1.amazonaws.com/dhamaka-pay
+  pullPolicy: IfNotPresent
+  tag: "does-not-exist"
+
+
+serviceAccount:
+  create: false
+  name: ""
+
+podAnnotations: {}
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/whitelist-source-range: "52.220.245.210/32, 54.255.231.175/32, 118.67.216.82/29, 13.250.161.172/32"
+  hosts:
+    - host: develop-pay.dhamakashopping.com
+
+
+configMap:
+  enabled: true
+  volumeMounts:
+    - mountPath: /app/application.properties
+      subPath: application.properties
+  data:
+  - application.properties: |-
+      server.port=8080
+      spring.data.mongodb.uri=mongodb://10.10.1.162:5556,10.10.1.162:5557,10.10.1.162:5558/dhamaka?readPreference=secondaryPreferred&maxStalenessSeconds=120&replicaSet=dhamaka_dev_rs
+      logging.pattern.console=%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n
+      management.endpoint.health.show-details=always
+      management.endpoint.metrics.enabled=true
+      management.endpoint.prometheus.enabled=true
+      management.metrics.export.prometheus.enabled=true
+
+resources:
+  limits:
+    cpu: 700m
+    memory: 1024Mi
+  requests:
+    cpu: 200m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 50
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 90

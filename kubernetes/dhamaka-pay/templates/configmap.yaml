@@ -1,0 +1,12 @@
+{{- if .Values.configMap.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "dhamaka-pay.fullname" . }}
+  labels:
+    {{- include "dhamaka-pay.labels" . | nindent 4 }}
+data:
+{{- range $item := .Values.configMap.data }}
+{{- toYaml $item | nindent 2 }}
+{{- end }}
+{{- end }}

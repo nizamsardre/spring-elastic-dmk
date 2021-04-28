@@ -1,0 +1,25 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jenkins-slave
+  annotations:
+    iam.amazonaws.com/role: arn:aws:iam::906388694478:role/jenkins-docker
+spec:
+  serviceAccountName: helm
+  containers:
+  - name: jnlp
+    image: jenkins/jnlp-slave:alpine
+  - name: tools
+    image: sohel2020/tools
+    command: ["sleep", "999999"]
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - mountPath: /var/run/docker.sock
+      name: docker-sock-volume
+  volumes:
+    - name: docker-sock-volume
+      hostPath:
+        path: /var/run/docker.sock
+        type: File
